@@ -47,11 +47,12 @@ int main()
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
     int sc = scanf ("%lg%lg%lg", &a, &b, &c);
-    printf ("sc = %d\n", sc);
+    fflush (stdin);
     while (sc != 3)
         {
+        printf ("Incorrect input, try again:\n");
         sc = scanf ("%lg%lg%lg", &a, &b, &c);
-        printf ("Incorrect input, try again\n");
+        fflush (stdin);
         }
     int nRoots = SolveSquare (a, b, c, &x1, &x2);
     if (nRoots == 2)
@@ -63,8 +64,6 @@ int main()
         printf ("x = %lg\n", x1) ;
         }
     }
-
-
 
 
 
