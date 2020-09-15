@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <io.h>
-int exchange (char text[255][255], int x, int y)
+int exchange (char text[255][255], int x, int y)  // Функция обменивает строчки
     {
     for (int i = 0; i < 255; i++)
         {
@@ -9,7 +9,7 @@ int exchange (char text[255][255], int x, int y)
         text[y][i] = chng;
         }
     }
-int strcmp (char s1[255][255], int y, int x)
+int strcmp (char s1[255][255], int y, int x)    // Функция сравнивает строчки
     {
     int i = 0;
     for ( i = 0; ((s1[y][i] != '\n') && (s1[x][i] != '\0')); i++)
@@ -36,7 +36,7 @@ int strcmp (char s1[255][255], int y, int x)
         return 0;
 
     }
-int bubbleSort (char text[255][255], int nstrok)
+int bubbleSort (char text[255][255], int nstrok)   // Функция сортирует массив из строчек
     {
     int k, m;
     for (k = 0; k < nstrok; k++)
