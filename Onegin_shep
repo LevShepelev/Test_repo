@@ -65,34 +65,30 @@ int main()
         {
         for (j = 0; j < 255; j++)
             {
-            text[i][j] = ' ';
+            text[i][j] = '\0';
             }
         }
     for (i = 0; !feof (fin); i++)
         {
         fscanf (fin,"%c", &(text[i][0]));
-        for (j = 1; (text[i][j-1] != ('\0')) && (!feof (fin)); j++)
+        for (j = 1; (text[i][j - 1] != ('\n')) && (!feof (fin)); j++)
             fscanf (fin, "%c", &(text[i][j]));
         text[i][j] = '\0';
         }
 
     int nstrok = i;
-    for (i = 0; i < nstrok; i++)
-        {
-        for (j = 0; (text[i][j] != ('\0') && (!feof (fin))); j++)
-            printf ("%c", text[i][j]);
-        }
     fclose (fin);
+    FILE *finwrite = fopen ("second.txt", "w");
     bubbleSort (text, nstrok);
-    fin = fopen ("first.txt", "w");
     for (i = 0; i < 255; i++)
         {
-        for (j = 0; j <255; j++)
+        for (j = 0; j <255 && text[i][j] != 0; j++)
             {
-            fprintf (fin, "%c", text[i][j]);
-            printf ("%c",text[i][j]);
+            fprintf (finwrite, "%c", text[i][j]);
             }
+        if (j != 0 && text[i][j - 1] != '\n')
+            fprintf(finwrite, "\n");
         }
-    fclose (fin);
-    return 5;
+    fclose (finwrite);
+    return 0;
     }
