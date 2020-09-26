@@ -2,36 +2,121 @@
 #include <math.h>
 
 const double epsilon = 1e-7;
-int Solvelinear (double a, double b, double* adr1)
+void red (double* a);
+int comparing (double a);
+int SolveSquare (double a, double b, double c, double* adr1, double* adr2);
+void Solvelinear (double a, double b, double* adr1);
+
+//-----------------------------------------------------------------------------
+
+void red (double* a) //Функция считывает числа типа double посимвольно, доступен ввод через запятую
+    {
+    int i = 0, err = 0, aftpoint = 0, n_aft = 0, nscan = 0, npoint = 0, neg = 0;
+
+    char num[36] = {'\0'};
+    do
+        {
+        err = 0;
+        scanf ("%s", num);
+        if (num[0] == '-')
+            neg = 1;
+        if (neg == 1)
+            i = 1;
+        else
+            i = 0;
+        for ( ; num[i] != '\0'; i++)
+            {
+            if ((num[i] == ',') || (num[i] == '.'))
+                npoint++;
+            if ((((num[i] > '9') || (num[i] < '0')) && (num[i] != '.') && (num[i] != ','))
+            || (npoint > 1) || (num[0] == ',') || (num[0] == '.'))
+                {
+                err = 1;
+                printf ("Incorrect input, try again:\n");
+                npoint = 0;
+                neg = 0;
+                fflush(stdin);
+                break;
+                }
+            }
+        }
+    while (err == 1);
+
+    for (i = 0; ((num[i] != ',') && (num[i] != '.') && (num[i] != '\0')); i++)
+        {
+        if (num[i] == '-')
+            i++;
+        nscan = nscan * 10 + num[i] - '0';
+        }
+    if ((num[i] = ',') || (num[i] = '.'))
+        {
+        for (int j = i + 1; (num[j] != '\0'); j++)
+            {
+            n_aft++;
+            aftpoint = 10 * aftpoint + num[j] - '0';
+            }
+        }
+    if (neg == 1)
+        *a = (-nscan - aftpoint / pow (10, n_aft));
+    else
+        *a = (nscan + aftpoint / pow (10, n_aft));
+    }
+
+
+//-----------------------------------------------------------------------------
+
+int comparing (double a)  // Функция сравнивает вызывается при сравнении числа double с нулем, и сравнивает с малым числом epsilon
+    {
+    if (a > epsilon) return 1;
+    if (fabs (a) < epsilon) return 0;
+    if (a < -epsilon) return -1;
+    return 0;
+    }
+
+//-----------------------------------------------------------------------------
+
+void Solvelinear (double b, double c, double* adr1) // Функция  решает линейное уравнение
     {
     printf("Your equation if linear, ");
-    if (fabs (a) > epsilon)
+
+    if ((comparing (b) != 0) && (comparing (c) == 0))
+            {
+            printf ("1 root, x = %d\n", 0);
+            *adr1 = 0;
+            }
+
+    if (((int)fabs(comparing (b)) == 1) && (comparing (c) != 0))
         {
-        printf ("1 root, x = %lg\n", -b / a);
-        *adr1 = -b / a;
+        printf ("1 root, x = %lg\n", -c / b);
+        *adr1 = -c / b;
         }
-    if ((fabs (a) < epsilon) && (fabs (b) < epsilon))
+
+    if ((comparing (b) == 0) && (comparing (c) == 0))
         printf ("Infinite number of roots");
-    if ((fabs (a) < epsilon) && (fabs (b) > epsilon))
+
+    if (((comparing (b) == 0) && ((int)fabs(comparing (c)) == 1)))
         printf ("No roots");
     }
-int SolveSquare (double a, double b, double c, double* adr1, double* adr2)
+
+//-----------------------------------------------------------------------------
+
+int SolveSquare (double a, double b, double c, double* adr1, double* adr2)   // Функция решения квдаратного урванения
     {
     double discriminant = b*b - 4*a*c;
     if (fabs (a) > epsilon)
         {
-        if (discriminant > epsilon)
+        if (comparing (discriminant) == 1)
             {
             *adr1 = (-b - sqrt (discriminant)) / (2*a);
             *adr2 = (-b + sqrt (discriminant)) / (2*a);
             return 2;
             }
-        if (fabs (discriminant) < epsilon)
+        if (comparing (discriminant) == 0)
             {
-            *adr1 = b / (2*a);
+            *adr1 = -b / (2*a);
             return 1;
             }
-        if (discriminant < -epsilon)
+        if (comparing (discriminant) == -1)
             {
             printf ("No roots");
             return 0;
@@ -39,22 +124,20 @@ int SolveSquare (double a, double b, double c, double* adr1, double* adr2)
         }
         else
         Solvelinear (b, c, adr1);
+    return 0;
     }
+
+//-----------------------------------------------------------------------------
+
 
 int main()
     {
     printf ("Square Equation Solver 2020\nWrite coefficient a, b, c\n");
-    double a = 0, b = 0, c = 0;
+    double mass[3];
     double x1 = 0, x2 = 0;
-    int sc = scanf ("%lg%lg%lg", &a, &b, &c);
-    fflush (stdin);
-    while (sc != 3)
-        {
-        printf ("Incorrect input, try again:\n");
-        sc = scanf ("%lg%lg%lg", &a, &b, &c);
-        fflush (stdin);
-        }
-    int nRoots = SolveSquare (a, b, c, &x1, &x2);
+    for (int i = 0; i < 3; i++)
+        red (mass + i);
+    int nRoots = SolveSquare (mass[0], mass[1], mass[2], &x1, &x2);
     if (nRoots == 2)
         {
         printf ("x1 = %+lg\n"  "x2 = %+lg\n", x1, x2);
@@ -63,7 +146,9 @@ int main()
         {
         printf ("x = %lg\n", x1) ;
         }
+    return 0;
     }
+
 
 
 
