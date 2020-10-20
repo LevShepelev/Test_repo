@@ -5,10 +5,11 @@ struct str{char* s; int l;};
 int cmp2 (struct str text1, struct str text2);
 int cmp1 (struct str text1, struct str text2);
 void bubbleSort(struct str* text, int nstr, int (*cmp)(struct str, struct str) );
-int filltext (FILE* fin, struct str* text, struct str* copyt);
+int filltext (FILE* fin, struct str** text, struct str** copyt);
+void qsortRecursive(struct str* text, int numb, int (*cmp)(struct str, struct str));
 
 /// \brief The fuction read text from file and fill array of struct
-int filltext (FILE* fin, struct str* text, struct str* copyt)
+int filltext (FILE* fin, struct str** text, struct str** copyt)
     {
     const int mem = 250;
     int nrealoc = 1;
@@ -17,38 +18,39 @@ int filltext (FILE* fin, struct str* text, struct str* copyt)
         {
         int krealoc = 1;
         int j = -1;
-        text[numb].s = (char*) calloc (mem, sizeof (char));
-        copyt[numb].s = (char*) calloc (mem, sizeof (char));
+        (*text)[numb].s = (char*) calloc (mem, sizeof (char));
+        (*copyt)[numb].s = (char*) calloc (mem, sizeof (char));
         for(;;)
             {
             j++;
-            text[numb].s[j] = (char)fgetc(fin);
-            copyt[numb].s[j] = text[numb].s[j];
-            if ((krealoc * mem - j) == 2)
+            (*text)[numb].s[j] = (char)fgetc(fin);
+            (*copyt)[numb].s[j] = (*text)[numb].s[j];
+            if ((krealoc * mem - j) <= 1 + 1)
                 {
                 krealoc++;
-                text[numb].s = (char*) realloc (text[numb].s, mem * krealoc * sizeof (char));
-                copyt[numb].s = (char*) realloc (text[numb].s, mem * krealoc * sizeof (char));
+                (*text)[numb].s  = (char*) realloc ((*text)[numb].s, mem * krealoc * sizeof (char));
+                (*copyt)[numb].s = (char*) realloc ((*copyt)[numb].s, mem * krealoc * sizeof (char));
                 }
-            if (((text[numb].s[j] == '\n') ||( text[numb].s[j] == EOF) || (text[numb].s[j] == '\0')) == 1)
+            if ((((*text)[numb].s[j] == '\n') ||( (*text)[numb].s[j] == EOF) || ((*text)[numb].s[j] == '\0')) == 1)
                 {
-                if (text[numb].s[j] != EOF)
+                if ((*text)[numb].s[j] != EOF)
                     {
-                    text[numb].s[j] = '\0';
-                    copyt[numb].s[j] = '\0';
+                    (*text)[numb].s[j] = '\0';
+                    (*copyt)[numb].s[j] = '\0';
                     }
-                text[numb].l = j;
-                copyt[numb].l = j;
+                (*text)[numb].l = j;
+                (*copyt)[numb].l = j;
                 break;
                 }
             }
-        if (text[numb].s[j] == EOF) break;
+        if ((*text)[numb].s[j] == EOF) break;
         numb++;
-        if ((nrealoc * mem - numb) == 1 + 1)
+        if ((nrealoc * mem - numb) <= 1)
                 {
                 nrealoc++;
-                text = (struct str*) realloc (text, mem * nrealoc * sizeof (struct str));
-                copyt = (struct str*) realloc (text, mem * nrealoc * sizeof (struct str));
+                (*text) = (struct str*) realloc ((*text), mem * nrealoc * sizeof (struct str));
+                (*copyt) = (struct str*) realloc ((*text), mem * nrealoc * sizeof (struct str));
+                printf ("Realocation %d\n", nrealoc);
                 }
         }
     return numb;
@@ -94,6 +96,56 @@ int cmp1 (struct str text1, struct str text2)
     return (text1.l < text2.l);
     }
 
+/// \brief Function sorts array of structure quickly, using different comparator
+void qsortRecursive(struct str* text, int numb, int (*cmp)(struct str, struct str))
+    {
+    //Указатели в начало и в конец массива
+    int i = 0;
+    int j = numb - 1;
+
+    //Центральный элемент массива
+    struct str mid = text[numb / 2];
+
+    //Делим массив
+    do
+        {
+        //Пробегаем элементы, ищем те, которые нужно перекинуть в другую часть
+        //В левой части массива пропускаем(оставляем на месте) элементы, которые меньше центрального
+        while(cmp(text[i], mid))
+            {
+            i++;
+            }
+        //В правой части пропускаем элементы, которые больше центрального
+        while(cmp(mid, text[j]))
+            {
+            j--;
+            }
+
+        //Меняем элементы местами
+        if (i <= j)
+            {
+            struct str tmp = text[i];
+            text[i] = text[j];
+            text[j] = tmp;
+            i++;
+            j--;
+            }
+        } while (i <= j);
+
+
+    //Рекурсивные вызовы, если осталось, что сортировать
+    if(j > 0)
+        {
+        //"Левый кусок"
+        qsortRecursive(text, j + 1, cmp);
+        }
+    if (i < numb)
+        {
+        //"Првый кусок"
+        qsortRecursive(&text[i], numb - i, cmp);
+        }
+    }
+
 /// \brief Function sorts array of structure, using different comparator
 void bubbleSort(struct str* text, int nstr, int (*cmp)(struct str, struct str) )
     {
@@ -114,32 +166,36 @@ void bubbleSort(struct str* text, int nstr, int (*cmp)(struct str, struct str) )
     }
 int main ()
     {
+    int n_empty = 0;
     FILE* fin = fopen("first.txt", "r");
     struct str* text = (struct str*) calloc (250, sizeof(struct str));
     struct str* copyt = (struct str*) calloc (250, sizeof(struct str));
-    int numb = filltext (fin, text, copyt);
+    int numb = filltext (fin, &text, &copyt);
     fclose (fin);
 
-    bubbleSort(text, numb, cmp1);
-    FILE* fout = fopen("first.txt", "w");
+    //bubbleSort(text, numb, cmp1);
+    qsortRecursive(text, numb, cmp1);
 
+    for (n_empty = 0; (text[n_empty].s[0] == '\0'); n_empty++);
 
-    fprintf (fout, "\n Sorted text \n");
-    for (int i = 0; i < numb; i++)
+    FILE* fout = fopen("second.txt", "w");
+
+    fprintf (fout, "Sorted text \n");
+    for (int i = n_empty; i < numb - 1; i++)
         fprintf (fout, "%s\n", text[i].s);
 
 
-    fprintf (fout, "\n  Rhyme Sorted text \n");
-    bubbleSort(text, numb, cmp2);
-    for (int i = 0; i < numb; i++)
+    fprintf (fout, "\nRhyme Sorted text\n");
+    //bubbleSort(text, numb, cmp2);
+    qsortRecursive(text, numb, cmp2);
+    for (int i = n_empty; i < numb; i++)
         fprintf (fout, "%s\n", text[i].s);
 
 
-    fprintf (fout, "\n  Original text \n");
+    fprintf (fout, "\nOriginal text\n");
     for (int i = 0; i < numb; i++)
         fprintf (fout, "%s\n", copyt[i].s);
 
     fclose (fout);
     return 0;
     }
-
