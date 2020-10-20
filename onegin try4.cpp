@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 struct str{char* s; int l;};
 int cmp2 (struct str text1, struct str text2);
 int cmp1 (struct str text1, struct str text2);
@@ -146,24 +145,7 @@ void qsortRecursive(struct str* text, int numb, int (*cmp)(struct str, struct st
         }
     }
 
-/// \brief Function sorts array of structure, using different comparator
-void bubbleSort(struct str* text, int nstr, int (*cmp)(struct str, struct str) )
-    {
-    struct str temp;
-    int k = 0, m = 0;
-    for (k = 0; k < nstr; k++)
-        {
-            for (m = nstr - 1; m > k; m--)
-            {
-            if (cmp(text[m], text[m - 1]))
-                {
-                temp = text[m];
-                text[m] = text[m - 1];
-                text[m - 1] = temp;
-                }
-            }
-        }
-    }
+
 int main ()
     {
     int n_empty = 0;
@@ -173,9 +155,8 @@ int main ()
     int numb = filltext (fin, &text, &copyt);
     fclose (fin);
 
-    //bubbleSort(text, numb, cmp1);
-    qsortRecursive(text, numb, cmp1);
 
+    qsortRecursive(text, numb, cmp1);
     for (n_empty = 0; (text[n_empty].s[0] == '\0'); n_empty++);
 
     FILE* fout = fopen("second.txt", "w");
@@ -186,7 +167,6 @@ int main ()
 
 
     fprintf (fout, "\nRhyme Sorted text\n");
-    //bubbleSort(text, numb, cmp2);
     qsortRecursive(text, numb, cmp2);
     for (int i = n_empty; i < numb; i++)
         fprintf (fout, "%s\n", text[i].s);
@@ -195,6 +175,8 @@ int main ()
     fprintf (fout, "\nOriginal text\n");
     for (int i = 0; i < numb; i++)
         fprintf (fout, "%s\n", copyt[i].s);
+    for (int i = 0; i < copyt[numb].l; i++)
+        fprintf (fout, "%c", copyt[numb].s[i]);
 
     fclose (fout);
     return 0;
