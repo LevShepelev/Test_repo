@@ -32,7 +32,17 @@ int main()
         struct client bank[10000];
         struct currency val[5];
         struct balance *total_balance;
+        struct client bank_ciphr[10000];
+        struct client bank_new[10000];
+        struct key ciphr[10000];
         currency_reference (val);
         customer_base (N, bank, val, total_balance);
+        account_encryption (N, bank, bank_ciphr, ciphr);
+        amount _encryption (N, bank, bank_ciphr, ciphr);
+        code_encryption (N, bank, bank_ciphr, ciphr);
+        decryption (N, bank_ciphr, bank_new, shiphr, total_balance);
+        verification (N , bank, bank_new);
+        int check (total_balance);
         return 0;
         }
+
