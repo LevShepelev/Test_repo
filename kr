@@ -1,0 +1,38 @@
+void currency_reference (struct currency *val)
+        {
+        for (int i = 0; i < 5; i++)
+                {
+                scanf("%s%s%d",val[i].currency_name, val[i].letter_code, &(val[i].currency_code));
+                }
+        }
+
+
+void customer_base (int N, struct client *bank,  struct currency *val, struct balance *total_balance)
+        {
+        for (int i = 0; i < N; i++)
+                        {
+                        scanf("%lld%d%d%d", &(bank[i].identification_number), &(bank[i].account), &(bank[i].amount), &(bank[i].code));
+                        if (bank[i].code = val[0].currency_code)
+                                total_balance->currency_start[0] += bank[i].amount;
+                        if (bank[i].code = val[1].currency_code)
+                                total_balance->currency_start[1] += bank[i].amount;
+                        if (bank[i].code = val[2].currency_code)
+                                total_balance->currency_start[2] += bank[i].amount;
+                        if (bank[i].code = val[3].currency_code)
+                                total_balance->currency_start[3] += bank[i].amount;
+                        if (bank[i].code = val[4].currency_code)
+                                total_balance->currency_start[4] += bank[i].amount;
+                        }
+        }
+
+int main()
+        {
+        int i = 0;
+        const int N = 10;
+        struct client bank[10000];
+        struct currency val[5];
+        struct balance *total_balance;
+        currency_reference (val);
+        customer_base (N, bank, val, total_balance);
+        return 0;
+        }
