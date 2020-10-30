@@ -28,7 +28,8 @@ void customer_base (int N, struct client *bank,  struct currency *val, struct ba
 int main()
         {
         int i = 0;
-        const int N = 10;
+        int n = 0;
+        scanf("%d", &n);
         struct client bank[10000];
         struct currency val[5];
         struct balance *total_balance;
