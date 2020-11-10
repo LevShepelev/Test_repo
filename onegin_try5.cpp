@@ -66,9 +66,10 @@ int cmp2 (const void* qtext1, const void* qtext2)
 void textprintf(struct str* text, int numb, FILE* fout)
     {
     int n_empty = 0;
-    for (n_empty = 0; (text[n_empty].s[0] == '\0'); n_empty++);
+    for (n_empty = 0; (text[n_empty].s[0] == '\n'); n_empty++);
     for (int i = n_empty; i < numb; i++)
-        fprintf(fout, "%s\n", text[i].s);
+        for (int j = 0; j <= text[i].l; j++)
+            fprintf(fout, "%c", *(text[i].s + j));
     }
 
 
@@ -77,7 +78,7 @@ int linecount(const char* buf, const int value)
     {
     int linecounter = 0;
 
-    for (int i = 0; i <= value; i++)  // ñ÷èòàåì ñêîëüêî ñòðîê
+    for (int i = 0; i <= value; i++)  // ÑÑ‡Ð¸Ñ‚Ð°ÐµÐ¼ ÑÐºÐ¾Ð»ÑŒÐºÐ¾ ÑÑ‚Ñ€Ð¾Ðº
         if (buf[i] == '\n')
             linecounter++;
     return linecounter + 1;
@@ -85,19 +86,14 @@ int linecount(const char* buf, const int value)
 
 
 /// \brief The function fill array of struct from bufer
-void filltext(const char* buf, struct str* text, const int numb)
+void filltext(char* buf, struct str* text, const int numb)
     {
     int j = 0;
     int i = 0;
 
     for (i = 0; i < numb; i++)
         {
-        text[i].s = (char*) calloc(text[i].l + 1, sizeof(char));
-        for (int m = 0; m <= text[i].l; m++)
-            {
-            text[i].s[m] = buf[m + j];
-            }
-        text[i].s[text[i].l] = '\0';
+        text[i].s = buf + j;
         j += text[i].l + 1;
         }
     }
@@ -119,7 +115,7 @@ void length_of_strings(const char* buf, struct str* text, const int numb, int va
 
 int main()
     {
-    printf("Welcome to text sorting machine");
+    printf("Welcome to text sorting machine...\n");
     FILE* fin = fopen("Onegin_input.txt", "r");
     struct stat statistica;
     int stat_error = stat ("Onegin_input.txt", &statistica);
@@ -154,7 +150,7 @@ int main()
 
     fprintf(fout, "\nOriginal Text\n%s", buf);
     fclose(fout);
-
+    printf("Well done !");
     free(buf);
     free(text);
     }
