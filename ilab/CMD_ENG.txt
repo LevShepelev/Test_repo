@@ -1,0 +1,7 @@
+push 1
+scanf
+printf
+push 3
+add 
+printf
+exit
