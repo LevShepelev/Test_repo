@@ -6,6 +6,6 @@ int main()
     char a[20] = {'a'};
     sprintf(a, "%d", r);
     for (int i = 0; i < 20; i++)
-        printf("%d  ", a[i]); 
+        printf("GIT_TEST%d  ", a[i]); 
     printf("%d", atoi(a));
     }
