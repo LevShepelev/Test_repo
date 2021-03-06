@@ -1,0 +1,13 @@
+Commands.txt
+ilab assemb prog.txt
+make
+make.o
+my_assemb
+my_assemb.o
+proc
+proc.o
+stack.o
+test
+test.o
+test.c
+test.txt
