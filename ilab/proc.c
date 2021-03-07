@@ -5,7 +5,7 @@ int main(int argc, char* argv[])
     cpu_t c1;
     for (int s = 0; s < 16; s++)
         c1.reg[s] = 0;
-    int d, u, sc;
+    int stack_scanf = 0,  u;
     int j = 0, i = 2;
     struct stat statistica;//массив регистров
     FILE* Commands = fopen(argv[1], "r");
@@ -61,13 +61,80 @@ int main(int argc, char* argv[])
                 printf("%d\n", stack_get(&c1.stack));
                 break;
             case CMD_SCANF:
-                scanf("%d", &u);
-                stack_push(&c1.stack, d);
+                scanf("%d", &stack_scanf);
+                stack_push(&c1.stack, stack_scanf);
                 break;
             case CMD_JMP:
                 c1.ID++;
                 c1.ID = atoi(c1.buf + c1.ID) - 2;
                 break;
+            case CMD_JMPB:
+                c1.ID++; 
+                if (stack_pop(&c1.stack) < c1.reg[15])
+                    c1.ID = atoi(c1.buf + c1.ID) - 2;
+                else
+                    {
+                    while (c1.buf[c1.ID] != '\n')
+                        c1.ID++;
+                    c1.ID--;
+                    }
+                break;
+            case CMD_JMPA:
+                c1.ID++; 
+                if (stack_pop(&c1.stack) > c1.reg[15])
+                    c1.ID = atoi(c1.buf + c1.ID) - 2;
+                else
+                    {
+                    while (c1.buf[c1.ID] != '\n')
+                        c1.ID++;
+                    c1.ID--;
+                    }
+                break;
+            case CMD_JMPE:
+                c1.ID++; 
+                if (stack_pop(&c1.stack) == c1.reg[15])
+                    c1.ID = atoi(c1.buf + c1.ID) - 2;
+                else
+                    {
+                    while (c1.buf[c1.ID] != '\n')
+                        c1.ID++;
+                    c1.ID--;
+                    }
+                break;
+            case CMD_JBE:
+                c1.ID++; 
+                if (stack_pop(&c1.stack) <= c1.reg[15])
+                    c1.ID = atoi(c1.buf + c1.ID) - 2;
+                else
+                    {
+                    while (c1.buf[c1.ID] != '\n')
+                        c1.ID++;
+                    c1.ID--;
+                    }
+                break;
+            case CMD_JAE:
+                c1.ID++; 
+                if (stack_pop(&c1.stack) >= c1.reg[15])
+                    c1.ID = atoi(c1.buf + c1.ID) - 2;
+                else
+                    {
+                    while (c1.buf[c1.ID] != '\n')
+                        c1.ID++;
+                    c1.ID--;
+                    }
+                break;
+            case CMD_JNE:
+                c1.ID++; 
+                if (stack_pop(&c1.stack) != c1.reg[15])
+                    c1.ID = atoi(c1.buf + c1.ID) - 2;
+                else
+                    {
+                    while (c1.buf[c1.ID] != '\n')
+                        c1.ID++;
+                    c1.ID--;
+                    }
+                break;
+
             default:
                 printf("CPU ERROR\n");
             }

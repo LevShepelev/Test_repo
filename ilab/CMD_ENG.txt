@@ -1,9 +1,10 @@
+push 15
+pop r15
 push 23
-scanf
-jmp L4:
-printf
-push 2
-add 
+push 12
 L2:
+scanf
+jmpb L2:
+add
 printf
 exit

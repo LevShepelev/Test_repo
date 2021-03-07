@@ -16,5 +16,11 @@ enum Commands
     CMD_PUSH_R = 9,
     CMD_EXIT   = 11,
     CMD_POP_R  = 12,
-    CMD_JMP    = 13
+    CMD_JMP    = 13,
+    CMD_JMPB   = 14,
+    CMD_JMPA   = 15,
+    CMD_JMPE   = 16,
+    CMD_JBE    = 17,
+    CMD_JAE    = 18,
+    CMD_JNE    = 19
     };

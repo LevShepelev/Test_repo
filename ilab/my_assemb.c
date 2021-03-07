@@ -1,6 +1,6 @@
 #include "my_assemb.h"
 
-void Finishing(FILE* CMD_MACHINE, FILE* CMD_ENG, FILE* log_file, mark_t* labels, char* bufout, char* bufin, int labels_size)
+void Finishing(FILE* CMD_MACHINE, FILE* CMD_ENG, FILE* log_file, mark_t* labels, char* bufout, char* bufin)
     {
     for (int z = 0; z < labels_size; z++)
         free(labels[z].name); 
@@ -11,14 +11,67 @@ void Finishing(FILE* CMD_MACHINE, FILE* CMD_ENG, FILE* log_file, mark_t* labels,
     fclose(CMD_ENG);
     }
 
+int Jumping(const char* bufin, char* bufout, mark_t* labels, FILE* log_file, int jump_type, int* i, int* j, int line_counter, int assemb_level)
+    {
+    for (int e = 0; e < labels_size; e++)
+        {
+        printf("Label[%d] = %d,  %s", e, labels[e].pointer, labels[e].name);
+        }
+    printf("Hello\n");
+    int k = 0, length = 0, debug;
+    while (bufin[*i] != ' ');
+        i++;
+    i++;
+    while (bufin[*i + length] != ':')
+        {
+        if (bufin[*i] == '\n')
+            {
+            if (assemb_level == 1) fprintf(log_file, "ERROR: incorrect format of function \"jump\", line %d\nexample: jmp HELL:\n", line_counter);
+                break;
+                return -1;
+            }
+        length++;
+        }
+    for (int z = 0; z < length; z++)
+        printf("%d ", bufin[*i + z]);
+    for (k = 0; (strncmp((bufin + *i), labels[k].name, length) != 0); k++)
+        if (k == labels_size - 1) 
+            {
+            k++;
+            break;
+            }
+        if (k < labels_size)
+            {
+            char p[max_pointer];
+            bufout[*j] = jump_type;
+            (*j)++;
+            int t = *j;
+            sprintf(p, "%d", labels[k].pointer);
+            while (p[*j - t] != 0)
+                {
+                bufout[*j] = p[(*j) - t];
+                (*j)++;
+                }
+            (*j)--;
+            }
+        else 
+        if (assemb_level == 1) 
+            {
+            fprintf(log_file, "ERROR: Label has not been found line %d\n", line_counter);
+            return -1;
+            }
+    printf("\n%d\n", bufin[*i]);
+    } 
+
 int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_file, int assemb_level)
     {
-    int i = 0, j = 0, mark_index = 0, line_counter = 1;
+    int i = 0, j = 0, mark_index = 0, line_counter = 1, debug;
     for (int i = 0; i < stat - 1; i++, j += 2)
         {
         if (!strncmp((bufin + i), "pop r", 5))
             {
-            bufout[j] = 12;
+            printf("pop r\n");
+            bufout[j] = CMD_POP_R;
             if ((bufin[i + 5] >= '0') && (bufin[i + 5] <= '9') && (bufin[i + 6] >= '0') && (bufin[i + 6] <= '9'))
                 {
                 bufout[j + 1] = bufin[i + 5] - '0';
@@ -35,12 +88,14 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
         else 
         if (!strncmp((bufin + i), "printf", 6))
             {
-            bufout[j] = 7;
+            printf("printf\n");
+            bufout[j] = CMD_PRINTF;
             }
         else
         if (!strncmp((bufin + i), "push r", 6))
             {
-            bufout[j] = 9;
+            printf("push r\n");
+            bufout[j] = CMD_PUSH_R;
             if ((bufin[i + 6] >= '0') && (bufin[i + 6] <= '9') && (bufin[i + 7] >= '0') && (bufin[i + 7] <= '9'))
                 {
                 bufout[j + 1] = bufin[i + 6] - '0';
@@ -57,7 +112,8 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
         else
         if (!strncmp((bufin + i), "push", 4))
             {
-            bufout[j] = 1;
+            printf("push\n");
+            bufout[j] = CMD_PUSH;
             j++;
             i += 5;
             while (bufin[i] != '\n')
@@ -78,42 +134,54 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
             j--;
             }
         else
+        if (!strncmp((bufin + i), "jmpb", 4))
+            {
+            printf("jmpb\n");
+            if (Jumping(bufin, bufout, labels, log_file, CMD_JMPB, &i, &j, line_counter, assemb_level) < 0)
+                return -1;
+            }
+        else
+        if (!strncmp((bufin + i), "jmpa", 4))
+            {
+            printf("jmpb\n");
+            if (Jumping(bufin, bufout, labels, log_file, CMD_JMPA, &i, &j, line_counter, assemb_level) < 0)
+                return -1;
+            }
+        else
+        if (!strncmp((bufin + i), "jmpe", 4))
+            {
+            printf("jmpb\n");
+            if (Jumping(bufin, bufout, labels, log_file, CMD_JMPE, &i, &j, line_counter, assemb_level) < 0)
+                return -1;
+            }
+        else
+        if (!strncmp((bufin + i), "jae", 3))
+            {
+            printf("jmpb\n");
+            if (Jumping(bufin, bufout, labels, log_file, CMD_JAE, &i, &j, line_counter, assemb_level) < 0)
+                return -1;
+            }
+        else
+        if (!strncmp((bufin + i), "jbe", 3))
+            {
+            printf("jmpb\n");
+            if (Jumping(bufin, bufout, labels, log_file, CMD_JBE, &i, &j, line_counter, assemb_level) < 0)
+                return -1;
+            }
+        else
+        if (!strncmp((bufin + i), "jne", 3))
+            {
+            printf("jmpb\n");
+            if (Jumping(bufin, bufout, labels, log_file, CMD_JNE, &i, &j, line_counter, assemb_level) < 0)
+                return -1;
+            }
+        else
         if (!strncmp((bufin + i), "jmp", 3))
             {
-            int k = 0, length = 0;
-            i += 4;
-            while (bufin[i + length] != ':')
-                {
-                if (bufin[i] == '\n')
-                    {
-                    if (assemb_level == 1) fprintf(log_file, "ERROR: incorrect format of function \"jump\", line %d\nexample: jmp HELL:\n", line_counter);
-                    break;
-                    return -1;
-                    }
-                length++;
-                }
-            for (k = 0; (strncmp((bufin + i), labels[k].name, length) != 0); k++)
-                if (k == labels_size - 1) break;
-            if (k < labels_size)
-                {
-                char p[max_pointer];
-                bufout[j] = 13;
-                j++;
-                int t = j;
-                sprintf(p, "%d", labels[k].pointer);
-                while (p[j - t] != 0)
-                    {
-                    bufout[j] = p[j - t];
-                    j++;
-                    }
-                j--;
-                }
-            else 
-            if (assemb_level == 1) 
-                {fprintf(log_file, "ERROR: Label has not been foundm line %d\n", line_counter);
-                return -1;
-                }
-            } 
+            printf("jmp\n");
+            if (Jumping(bufin, bufout, labels, log_file,  CMD_JMP, &i, &j, line_counter, assemb_level) < 0)
+                return -1; 
+            }
         else
         if ((bufin[i] > 'A') && (bufin[i] < 'Z')) // заполнение массива меток (указатели)
             {
@@ -142,43 +210,56 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
         else 
         if (!strncmp((bufin + i), "exit", 4))
             {
-            bufout[j] = 11;
+            printf("exit\n");
+            bufout[j] = CMD_EXIT;
             }
         else
         if (!strncmp((bufin + i), "add", 3))
             {
-            bufout[j] = 2;
+            printf("add\n");
+            bufout[j] = CMD_ADD;
             }
         else
         if (!strncmp((bufin + i), "mult", 4))
             {
-            bufout[j] = 3;
+            printf("mult\n");
+            bufout[j] = CMD_MULT;
             }
         else
         if (!strncmp((bufin + i), "mod", 3))
             {
-            bufout[j] = 6;
+            printf("mod\n");
+            bufout[j] = CMD_MOD;
             }
         else
         if (!strncmp((bufin + i), "sub", 3))
             {
-            bufout[j] = 4;
+            printf("sub\n");
+            bufout[j] = CMD_SUB;
             }
         else
         if (!strncmp((bufin + i), "scanf", 5))
             {
-            bufout[j] = 8;
+            printf("scanf\n");
+            bufout[j] = CMD_SCANF;
             }
         else
         if (!strncmp((bufin + i), "div", 3))
             {
-            bufout[j] = 5;
+            printf("div\n");
+            bufout[j] = CMD_DIV;
             }
         else 
+        if (assemb_level == 1) 
             {
-            if (assemb_level == 1) fprintf(log_file, "ERROR: incorrect command name, line %dy\n", line_counter);
+            printf("error\n");
+            fprintf(log_file, "ERROR: incorrect command name, line %d\n", line_counter);
             return -1;
             }
+        for (int e = 0; e < j; e++)
+            printf("%d ", bufout[e]); 
+        printf("\n");
+        printf("bufin[%d] = %d = %c\n", i,  bufin[i], bufin[i]); 
         line_counter++;
         while (bufin[i] != '\n')
             i++;
@@ -193,10 +274,9 @@ int main(int argc, char* argv[])
     mark_t labels[labels_size];
     for (int z = 0; z < labels_size; z++)
         {
-        labels[z].name = (char*) calloc (labels_size, sizeof(char));
+        labels[z].name = (char*) calloc (Label_name_size, sizeof(char));
         labels[z].pointer = -1;
         }
-    const int log_size = 2000;
     int j = 0, test = 0;
     struct stat statistica;
     FILE* CMD_ENG     = fopen(argv[1], "r");
@@ -218,15 +298,16 @@ int main(int argc, char* argv[])
         char* log = (char*) calloc ((statistica.st_size + 1), sizeof(char));
         fread ((void*) log, sizeof(char), statistica.st_size, logf);
         printf("%s", log);
-        Finishing(CMD_MACHINE, CMD_ENG, logf, labels, bufout,bufin, labels_size);
+        Finishing(CMD_MACHINE, CMD_ENG, logf, labels, bufout, bufin);
         return -1;
         }
     bufout[j + 1] = '\0';
+    printf("assemb end\n");
     for (int k = 0; k <= j + 2; k++)    
         {
         fprintf(CMD_MACHINE, "%c", bufout[k]);
-        //printf("%d\n", bufout[k]);
+        printf("%d\n", bufout[k]);
         }
-    Finishing(CMD_MACHINE, CMD_ENG, log_file, labels, bufout, bufin, labels_size);
+    Finishing(CMD_MACHINE, CMD_ENG, log_file, labels, bufout, bufin);
     return 0;
     }
