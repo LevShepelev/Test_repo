@@ -7,7 +7,7 @@ enum Commands
     {
     CMD_PUSH   = 1,
     CMD_ADD    = 2,
-    CMD_MULT   = 3,
+    CMD_MUL   = 3,
     CMD_SUB    = 4,
     CMD_DIV    = 5,
     CMD_MOD    = 6,

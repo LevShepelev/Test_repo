@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "my_assemb.h": "c"
+        "my_assemb.h": "c",
+        "typeinfo": "cpp"
     }
 }

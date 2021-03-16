@@ -66,7 +66,7 @@ int Jumping(const char* bufin, char* bufout, mark_t* labels, FILE* log_file, int
 int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_file, int assemb_level)
     {
     int i = 0, j = 0, mark_index = 0, line_counter = 1, debug;
-    for (int i = 0; i < stat - 1; i++, j += 2)
+    for (i = 0; i < stat - 1; i++, j += 2)
         {
         if (!strncmp((bufin + i), "pop r", 5))
             {
@@ -86,12 +86,6 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
                 }
             }
         else 
-        if (!strncmp((bufin + i), "printf", 6))
-            {
-            printf("printf\n");
-            bufout[j] = CMD_PRINTF;
-            }
-        else
         if (!strncmp((bufin + i), "push r", 6))
             {
             printf("push r\n");
@@ -132,6 +126,12 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
                 }
             i--;
             j--;
+            }
+        else
+        if (!strncmp((bufin + i), "printf", 6))
+            {
+            printf("printf\n");
+            bufout[j] = CMD_PRINTF;
             }
         else
         if (!strncmp((bufin + i), "jmpb", 4))
@@ -220,9 +220,9 @@ int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_
             bufout[j] = CMD_ADD;
             }
         else
-        if (!strncmp((bufin + i), "mult", 4))
+        if (!strncmp((bufin + i), "mul", 4))
             {
-            printf("mult\n");
+            printf("mul\n");
             bufout[j] = CMD_MULT;
             }
         else

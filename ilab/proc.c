@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
             case CMD_ADD:
                 stack_push(&c1.stack, stack_pop(&c1.stack) + stack_pop(&c1.stack));
                 break;
-            case CMD_MULT:
+            case CMD_MUL:
                 stack_push(&c1.stack, stack_pop(&c1.stack) * stack_pop(&c1.stack));
                 break;
             case CMD_SUB:

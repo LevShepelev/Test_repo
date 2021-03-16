@@ -84,7 +84,7 @@ void stack_push(mystack* s1, data inp)
         if (s1 -> top >= s1 -> capacity)
             {
             data* temp = s1 -> arr;
-            realloc (temp, (s1 -> capacity + 1)*sizeof(data));
+            temp = (data*) realloc (temp, (s1 -> capacity + 10)*sizeof(data));
             if (temp != NULL)
                 s1 -> arr = temp;
             else
@@ -123,7 +123,11 @@ data stack_pop(mystack* s1)
 
             return temp;
             }
-        else printf("stack is empty");
+        else 
+            {
+            printf("stack is empty");
+            return poison;
+            }
         }
     else return poison;
     }
