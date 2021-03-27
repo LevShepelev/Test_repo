@@ -1,23 +1,22 @@
-push 2
+push 0
 pop rcx
-push 10
+push 9
 pop rsi; ищем факториал 9
 push 1
 pop rax
+push 2 
+pop rbx
 call Factorial:
-push rbx
 printf
 exit
 
 Factorial:
-push rax
-push rcx
-mul
-debug
-scanf 
-printf
+pop rax 
 pop rbx
-pop rax
+push rax
+push rbx
+push rax
+mul
 call INCrcx:
 push rcx
 jbe Factorial:

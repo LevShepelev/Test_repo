@@ -61,7 +61,7 @@ int Jumping(const char* bufin, char* bufout, mark_t* labels, FILE* log_file, int
             return -1;
             }
     printf("\n%d\n", bufin[*i]);
-    } 
+    }
 
 int assemb(mark_t* labels, const char* bufin, char* bufout, int stat, FILE* log_file, int assemb_level)
     {
