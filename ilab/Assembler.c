@@ -33,15 +33,23 @@ void Finishing(FILE* CMD_MACHINE, FILE* CMD_ENG, mark_t* labels, assemb_t* pr)
 
 
 
-void write_number_like_chars(int number, assemb_t* pr)
+void write_number_like_chars(double number, assemb_t* pr)
     {
     assert(pr != NULL);
-    for (int i = 0; i < data_size; i++, pr -> wi++)
-        {
-        pr -> Output[pr -> wi] = ((char) (number >> 8*i)) & 0xFF;
-        printf("write_number = %d\n", pr -> Output[pr -> wi]);
-        }
-    pr -> wi--;
+    *(double*)(pr -> Output + pr -> wi) = number;
+    pr -> wi += data_size - 1;
+    }
+
+
+
+void Putting_number_into_machine_code(assemb_t* pr)
+    {
+    char *endptr, numb_byte[data_size];
+    double number = strtod(pr -> lexemm, &endptr);
+    //printf("strtod = %lf\n", number);
+    if (endptr - (pr -> lexemm) != strlen(pr -> lexemm))
+        error_report(pr, "ERROR: incorrect input in function \"push\", line %d\n");
+    write_number_like_chars(number, pr);
     }
 
 
@@ -61,8 +69,18 @@ void get_lexemm(assemb_t* pr)
     assert(pr != NULL);
     int k = 0;
     for (k = 0; (pr -> Input[pr -> ri] != ' ') && (pr -> Input[pr -> ri] != '\n') && (pr -> Input[pr -> ri] != ';') && (pr -> ri < pr -> buf_size); pr -> ri++, k++)
-        pr -> lexemm[k] = pr -> Input[pr -> ri];
+        {
+        if (pr -> Input[pr -> ri] == '[')
+            k--;
+        else if (pr -> Input[pr -> ri] == ']')
+            {
+            IsCommandRam = 1;
+            pr -> lexemm[k] = '\0';
+            }
+        else pr -> lexemm[k] = pr -> Input[pr -> ri];
+        }
     pr -> lexemm[k] = '\0';
+
     if (pr -> Input[pr -> ri] == ';')
         for (; pr -> Input[pr -> ri] != '\n'; pr -> ri++) // comments
             ;
@@ -102,35 +120,66 @@ int Start (char* Input_file_name, FILE* CMD_ENG, assemb_t* pr, mark_t* labels)
 
 
 
+void Crypting_name_of_register(assemb_t* pr)
+    {
+    if (!strcmp(pr -> lexemm, "rax"))
+        pr -> Output[pr -> wi] = CMD_RAX;
+
+    else if (!strcmp(pr -> lexemm, "rbx"))
+        pr -> Output[pr -> wi] = CMD_RBX;
+
+    else if (!strcmp(pr -> lexemm, "rcx"))
+        pr -> Output[pr -> wi] = CMD_RCX;
+
+    else if (!strcmp(pr -> lexemm, "rdx"))
+        pr -> Output[pr -> wi] = CMD_RDX;
+
+    else if (!strcmp(pr -> lexemm, "rsi"))
+        pr -> Output[pr -> wi] = CMD_RSI;
+
+    else 
+        error_report(pr, "ERROR: incorrect name of register, line %d\n");
+    }
+
+
+
+void RAM_handling(assemb_t* pr, int first_cmd, int sec_cmd)
+    {
+    if ((pr ->lexemm[0] >= '0') && (pr -> lexemm[0] <= '9'))
+        {
+        pr -> Output[pr -> wi] = first_cmd;
+        pr -> wi++;
+        Putting_number_into_machine_code(pr);
+        }
+    else
+        {
+        pr -> Output[pr -> wi] = sec_cmd;
+        pr -> wi++;
+        Crypting_name_of_register(pr);
+        }
+    IsCommandRam = 0;
+    }
+
+
+
 void push_handling(assemb_t* pr)
     {
     assert(pr != NULL);
     get_lexemm(pr);
-    printf("lexemm = %s\n", pr -> lexemm);
-    if (pr -> lexemm[0] == 'r')
+    if (IsCommandRam)
+        RAM_handling(pr, CMD_PUSH_RAM_NUM, CMD_PUSH_RAM_REG);
+    
+    else if (pr -> lexemm[0] == 'r')
         {
         pr -> Output[pr -> wi] = CMD_PUSH_R;
         pr -> wi++;
-        if (!strcmp(pr -> lexemm, "rax"))
-            pr -> Output[pr -> wi] = CMD_RAX;
-        else if (!strcmp(pr -> lexemm, "rbx"))
-            pr -> Output[pr -> wi] = CMD_RBX;
-        else if (!strcmp(pr -> lexemm, "rcx"))
-            pr -> Output[pr -> wi] = CMD_RCX;
-        else if (!strcmp(pr -> lexemm, "rdx"))
-            pr -> Output[pr -> wi] = CMD_RDX;
-        else 
-            error_report(pr, "ERROR: incorrect name of register, line %d\n");
+        Crypting_name_of_register(pr);
         }
     else
         {
         pr -> Output[pr -> wi] = CMD_PUSH;
         pr -> wi++;
-        char *endptr, numb_byte[data_size];
-        int number = strtol(pr -> lexemm, &endptr, 0);
-        if (endptr - (pr -> lexemm) != strlen(pr -> lexemm))
-            error_report(pr, "ERROR: incorrect input in function \"push\", line %d\n");
-        write_number_like_chars(number, pr);
+        Putting_number_into_machine_code(pr);
         }
     }
 
@@ -140,23 +189,14 @@ void pop_handling(assemb_t* pr)
     {
     assert(pr != NULL);
     get_lexemm(pr);
-    printf("lexemm = %s\n", pr -> lexemm);
-    if (pr -> lexemm[0] = 'r')
+    if (IsCommandRam)
+        RAM_handling(pr, CMD_POP_RAM_NUM, CMD_POP_RAM_REG);
+
+    else if (pr -> lexemm[0] == 'r')
         {
         pr -> Output[pr -> wi] = CMD_POP_R;
         pr -> wi++;
-        if (!strcmp(pr -> lexemm, "rax"))
-            pr -> Output[pr -> wi] = CMD_RAX;
-        else if (!strcmp(pr -> lexemm, "rbx"))
-            pr -> Output[pr -> wi] = CMD_RBX;
-        else if (!strcmp(pr -> lexemm, "rcx"))
-            pr -> Output[pr -> wi] = CMD_RCX;
-        else if (!strcmp(pr -> lexemm, "rdx"))
-            pr -> Output[pr -> wi] = CMD_RDX;
-        else if (!strcmp(pr -> lexemm, "rsi"))
-            pr -> Output[pr -> wi] = CMD_RSI;   
-        else 
-            error_report(pr, "ERROR: incorrect name of register, line %d\n");
+        Crypting_name_of_register(pr);
         }
     }
 
@@ -219,7 +259,7 @@ int assembling(mark_t* labels, assemb_t* pr)
     for (pr -> ri = 0; pr -> ri < pr -> buf_size; pr -> wi++)
         {
         get_lexemm(pr);
-        printf("wi = %d lexemm = %s\n", pr -> wi,  pr -> lexemm);
+        //printf("wi = %d lexemm = %s\n", pr -> wi,  pr -> lexemm);
 
         if (strchr(pr -> lexemm, ':') != NULL)
             Label_handling(pr, labels);
@@ -247,6 +287,12 @@ int assembling(mark_t* labels, assemb_t* pr)
         
         else if (!strcmp(pr -> lexemm, "div"))
             pr -> Output[pr -> wi] = CMD_DIV;
+
+        else if (!strcmp(pr -> lexemm, "divD"))
+            pr -> Output[pr -> wi] = CMD_divD;
+
+        else if (!strcmp(pr -> lexemm, "sqrt"))
+            pr -> Output[pr -> wi] = CMD_SQRT;
         
         else if (!strcmp(pr -> lexemm, "printf"))
             pr -> Output[pr -> wi] = CMD_PRINTF;
@@ -307,6 +353,7 @@ int assembling(mark_t* labels, assemb_t* pr)
             pr -> Output[pr -> wi] = CMD_JNE;
             Jump_handling(pr, labels);
             }
+
         else if (!strcmp(pr -> lexemm, "debug"))
             pr -> Output[pr -> wi] = CMD_DEBUG;
 
@@ -339,7 +386,7 @@ int main(int argc, char* argv[])
     for (int i = 0; i < pr.wi; i++)
         {
         fprintf(CMD_MACHINE, "%c", pr.Output[i]);
-        printf("%d ID = %d\n", pr.Output[i], i);
+        //printf("%d ID = %d\n", pr.Output[i], i);
         }
     
     Finishing(CMD_MACHINE, CMD_ENG, labels, &pr);

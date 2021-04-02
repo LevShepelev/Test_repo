@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <math.h>
 int main()
     {
         struct stat statistica;
@@ -12,5 +13,5 @@ int main()
     char* bufin = (char*) calloc ((statistica.st_size + 1), sizeof(char));
     fread ((void*) bufin, sizeof(char), statistica.st_size, fin);
     for (int i = 0; i < 9; i++)
-        printf("%u\n", bufin[i]);
+        printf("%f\n", sqrt(bufin[i]));
     }

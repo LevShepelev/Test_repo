@@ -11,3 +11,14 @@ test
 test.o
 test.c
 test.txt
+Assembler.o
+Assembler
+CMD_ENG.txt
+CPU
+CPU.o
+ilab assemb prog.txt
+log.txt
+make_try_2.c
+make_try_2.o
+make_try_2
+my_assemb.c

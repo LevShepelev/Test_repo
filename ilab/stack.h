@@ -3,7 +3,7 @@
 #include <assert.h>
 #define poison -666
 #define canary 0xDEADBEEFBEEFDEAD
-typedef int data;
+typedef double data;
 
 typedef struct str_stack {unsigned long long canary_left; unsigned long long hash_guard; int top; int capacity; data* arr; unsigned long long canary_right;} mystack;
 
