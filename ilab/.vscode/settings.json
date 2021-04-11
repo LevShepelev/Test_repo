@@ -2,6 +2,7 @@
     "files.associations": {
         "my_assemb.h": "c",
         "typeinfo": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "system_error": "cpp"
     }
 }

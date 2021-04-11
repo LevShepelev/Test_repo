@@ -239,7 +239,6 @@ void Jump_handling(assemb_t* pr, mark_t* labels)
     for (i = 0; i < labels_size; i++)
         if (strcmp(labels[i].name, pr -> lexemm) == 0) 
             {
-            printf("HERE lexemm = %s\n", pr -> lexemm);
             write_number_like_chars(labels[i].pointer, pr);
             return;
             }

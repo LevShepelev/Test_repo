@@ -1,5 +1,4 @@
 #include "proc.h"
-char debug;
 
 void push_handling(cpu_t* c1)
     {
@@ -206,7 +205,7 @@ void execution(cpu_t* c1)
                 break;
 
             default:
-                scanf("%c", &debug);
+                //scanf("%c");
                 printf("CPU ERROR\n");
             }
         }

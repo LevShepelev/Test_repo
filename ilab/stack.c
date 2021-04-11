@@ -140,7 +140,7 @@ data stack_pop(mystack* s1)
 void print_stack(mystack* s1)
     {
     assert(s1 != NULL);
-    //if (verification(s1) == 0)
+    if (verification(s1) == 0)
         {
         printf("Stack adress = %p\nStack capacity = %d\ntop = %d\narray adress = %p\nhash = %llu\nstack contains:\n", s1, s1 -> capacity, s1 -> top, s1 -> arr, s1 -> hash_guard);
         if (s1 -> top == -1)

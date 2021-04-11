@@ -2,21 +2,29 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "stack.h"
+#include "stackCpp.h"
 #include <math.h>
-//#include "stack_pointer.h"
 #define number_of_registers 16
-typedef struct cpu {char* buf; int buf_size; int ID; double reg[number_of_registers]; mystack* stack; mystack* stack_pointer; void* RAM;} cpu_t;
+class CPU
+        {
+        char* buf; 
+        int buf_size; 
+        int ID; 
+        double reg[number_of_registers]; 
+        Stack* stack; 
+        Stack* stack_pointer; 
+        void* RAM;
+        public:
+        CPU(char* Commands_file_name);
+        ~CPU();
+        void execution();
+        void decryption_number_to_rdi();
+        void jump_handling();
+        void push_handling();
+        };
 const int data_size = 8;
 const int byte_size = 8;
 const unsigned RAM_size = 0x100000; //1 Мб
-void starting(cpu_t* c1, char* file_name);
-void execution(cpu_t* c1);
-void jump_handling(cpu_t* c1);
-void decryption_number_to_rdi(cpu_t* c1);
-
-
-
 
 enum Commands
     {
