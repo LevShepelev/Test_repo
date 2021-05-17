@@ -2,16 +2,19 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/stat.h>
+
+struct str{char* s; int l;};
+
 int linecount(const char* buf, const int value);
-void length_of_strings(const char* buf, struct str* text, const int value);
-void filltext(const char* buf, struct str* text, const int numb);
-void textprintf(struct str* text, int numb);
+void filltext(char* buf, struct str* text, const int numb);
 int cmp1 (const void* qtext1, const void* qtext2);
 int cmp2 (const void* qtext1, const void* qtext2);
 void textprintf(struct str* text, int numb, FILE* fout);
 void length_of_strings(const char* buf, struct str* text, const int numb, int value);
-
-struct str{char* s; int l;};
+char* starting(int* numb, struct str** text);
+void* my_calloc (int size_of_elem, int size);
+void writing_to_file(char* buf, struct str* text, int numb);
+void finishing(char* buf, struct str* text);
 
 
 /// \brief general comparator for strings
@@ -38,6 +41,8 @@ int cmp1 (const void* qtext1, const void* qtext2)
     if (text1.l == text2.l) return 0;
     }
 
+
+
 /// \brief Rhyme Comparator, it compare symbols of 2 strings from the end of strings
 int cmp2 (const void* qtext1, const void* qtext2)
     {
@@ -62,6 +67,8 @@ int cmp2 (const void* qtext1, const void* qtext2)
     if (text1.l == text2.l) return 0;
     }
 
+
+
 /// \brief The function prints text to file
 void textprintf(struct str* text, int numb, FILE* fout)
     {
@@ -71,6 +78,7 @@ void textprintf(struct str* text, int numb, FILE* fout)
         for (int j = 0; j <= text[i].l; j++)
             fprintf(fout, "%c", *(text[i].s + j));
     }
+
 
 
 /// \brief The function count number of lines in the text
@@ -85,6 +93,7 @@ int linecount(const char* buf, const int value)
     }
 
 
+
 /// \brief The function fill array of struct from bufer
 void filltext(char* buf, struct str* text, const int numb)
     {
@@ -97,6 +106,8 @@ void filltext(char* buf, struct str* text, const int numb)
         j += text[i].l + 1;
         }
     }
+
+
 
 /// \brief The function count length of each string in text
 void length_of_strings(const char* buf, struct str* text, const int numb, int value)
@@ -113,7 +124,8 @@ void length_of_strings(const char* buf, struct str* text, const int numb, int va
 
 
 
-int main()
+/// \brief The function open file and fill the bufer
+char* starting(int* numb, struct str** text)
     {
     printf("Welcome to text sorting machine...\n");
     FILE* fin = fopen("Onegin_input.txt", "r");
@@ -121,20 +133,41 @@ int main()
     int stat_error = stat ("Onegin_input.txt", &statistica);
     assert(stat_error == 0);
 
-    char* buf = (char*) calloc (statistica.st_size + 1, sizeof(char));
-
+    char* buf = (char*) my_calloc (statistica.st_size + 1, sizeof(char));
 
     fread ((void*) buf, sizeof(char), statistica.st_size, fin);  // recording text in bufer
 
+    *numb = linecount(buf, statistica.st_size); //finding the number of strings in the text
+
+    (*text) = (struct str*) my_calloc (*numb, sizeof(struct str));
+    length_of_strings(buf, *text, *numb, statistica.st_size);
+
     fclose (fin);
 
-    int numb = linecount(buf, statistica.st_size); //finding the number of strings in the text
+    return buf;
+    }
 
-    struct str* text = (struct str*) calloc (numb, sizeof(struct str));
 
-    length_of_strings(buf, text, numb, statistica.st_size);
 
-    filltext(buf, text, numb);
+/// \brief The function allocate memory carefully
+void* my_calloc (int size_of_elem, int size)
+    {
+    char* mem = (char*) calloc (size, size_of_elem);
+    if (mem == NULL) 
+        {
+        printf("Calloc error\n");
+        exit (1);
+        }
+    return mem;
+    }
+
+
+
+/// \brief The function write sort version to file
+void writing_to_file(char* buf, struct str* text, int numb)
+    {
+    assert(text);
+    assert(buf);
 
     FILE* fout = fopen("Onegin_output.txt", "w");
 
@@ -150,7 +183,27 @@ int main()
 
     fprintf(fout, "\nOriginal Text\n%s", buf);
     fclose(fout);
-    printf("Well done !");
+    }
+
+
+
+/// \brief The function free memory
+void finishing(char* buf, struct str* text)
+    {
+    printf("Well done !\n");
     free(buf);
     free(text);
+    }
+
+
+
+int main()
+    {
+    struct str* text = NULL;
+    int numb = 0;
+    char* buf = starting(&numb, &text);
+
+    filltext(buf, text, numb);
+    writing_to_file(buf, text, numb);
+    finishing(buf, text);
     }
