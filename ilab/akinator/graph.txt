@@ -1,0 +1,15 @@
+digraph G{
+smart->docent->insect->lev;
+insect->beauty->tarakan;
+beauty->butterfly;
+docent->shiz->kalashnikov;
+shiz->ribnikov;
+smart->human->robot->1.5;
+robot->akinator;
+human->sharit_za_fiziku->doctor->B01_009->prepod->pavel;
+prepod->ded;
+B01_009->nikita;
+doctor->znamka;
+sharit_za_fiziku->bold->ovchos;
+bold->buligin;
+}
