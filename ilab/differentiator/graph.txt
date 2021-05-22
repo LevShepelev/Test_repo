@@ -1,7 +1,0 @@
-digraph G{
-a*a->a^a->axa;
-a^a->a2a;
-a*a->asina->a+a->a5a;
-a+a->aya;
-asina;
-}
